@@ -1,9 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     TournamentViewSet, StageViewSet, GroupViewSet, TeamViewSet, PlayerViewSet,
     VenueViewSet, RefereeViewSet, MatchViewSet, MatchEventViewSet, StandingViewSet,
-    PublicStandingsView, PublicScheduleView, CalculateStandingsView  # 👈 Importación nueva
+    PublicStandingsView, PublicScheduleView, CalculateStandingsView,
+    registro_usuario
 )
 
 router = DefaultRouter()
@@ -21,10 +23,15 @@ router.register(r'standings', StandingViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 
-    # Endpoints públicos
+    # 🔐 Autenticación con JWT
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('registro/', registro_usuario, name='registro'),
+
+    # 🌐 Endpoints públicos
     path('public/standings/<int:tournament_id>/', PublicStandingsView.as_view(), name='public-standings'),
     path('public/schedule/<int:stage_id>/', PublicScheduleView.as_view(), name='public-schedule'),
 
-    # Endpoint para calcular tabla
+    # ⚽ Recalcular tabla de posiciones
     path('calculate-standings/<int:tournament_id>/', CalculateStandingsView.as_view(), name='calculate-standings'),
 ]

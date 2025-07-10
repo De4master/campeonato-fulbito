@@ -1,6 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth.models import User
 from django.db.models import F
 from collections import defaultdict
 
@@ -8,77 +11,86 @@ from .models import Tournament, Stage, Group, Team, Player, Venue, Referee, Matc
 from .serializers import (
     TournamentSerializer, StageSerializer, GroupSerializer,
     TeamSerializer, PlayerSerializer, VenueSerializer,
-    RefereeSerializer, MatchSerializer, MatchEventSerializer, StandingSerializer
+    RefereeSerializer, MatchSerializer, MatchEventSerializer,
+    StandingSerializer, UserSerializer
 )
 
-# ----------------------
-# CRUD API ViewSets
-# ----------------------
+# ---------------------- CRUD protegidos con JWT (excepto Team y Player) ----------------------
 
 class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
+    permission_classes = [IsAuthenticated]
 
 class StageViewSet(viewsets.ModelViewSet):
     queryset = Stage.objects.all()
     serializer_class = StageSerializer
+    permission_classes = [IsAuthenticated]
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated]
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]  # 👈 GET público
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]  # 👈 GET público
 
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+    permission_classes = [IsAuthenticated]
 
 class RefereeViewSet(viewsets.ModelViewSet):
     queryset = Referee.objects.all()
     serializer_class = RefereeSerializer
+    permission_classes = [IsAuthenticated]
 
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
+    permission_classes = [IsAuthenticated]
 
 class MatchEventViewSet(viewsets.ModelViewSet):
     queryset = MatchEvent.objects.all()
     serializer_class = MatchEventSerializer
+    permission_classes = [IsAuthenticated]
 
 class StandingViewSet(viewsets.ModelViewSet):
     queryset = Standing.objects.all()
     serializer_class = StandingSerializer
+    permission_classes = [IsAuthenticated]
 
-# ----------------------
-# Endpoints públicos
-# ----------------------
+# ---------------------- Públicos (sin autenticación) ----------------------
 
 class PublicStandingsView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, tournament_id):
         standings = Standing.objects.filter(tournament_id=tournament_id).order_by('-points', '-gd', '-gf')
         data = StandingSerializer(standings, many=True).data
         return Response(data)
 
 class PublicScheduleView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, stage_id):
-        matches = Match.objects.filter(stage_id=stage_id).order_by('date')  # 👈 usamos 'date'
+        matches = Match.objects.filter(stage_id=stage_id).order_by('date')
         serialized_matches = MatchSerializer(matches, many=True).data
         for match in serialized_matches:
             events = MatchEvent.objects.filter(match_id=match["id"]).order_by("minute")
             match["events"] = MatchEventSerializer(events, many=True).data
         return Response(serialized_matches)
 
-# ----------------------
-# Calcular tabla de posiciones
-# ----------------------
-
 class CalculateStandingsView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, tournament_id):
         Standing.objects.filter(tournament_id=tournament_id).delete()
 
@@ -129,3 +141,14 @@ class CalculateStandingsView(APIView):
             )
 
         return Response({"message": "Tabla de posiciones actualizada."})
+
+# ---------------------- Registro público ----------------------
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def registro_usuario(request):
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response({"message": "Usuario creado correctamente."})
+    return Response(serializer.errors, status=400)

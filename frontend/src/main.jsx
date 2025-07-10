@@ -8,22 +8,28 @@ import App from './App';
 import Equipos from './pages/Equipos';
 import Jugadores from './pages/Jugadores';
 import Tabla from './pages/Tabla';
-import Calendario from './pages/Calendario'; // 👈 NUEVA importación
+import Calendario from './pages/Calendario';
+import Login from './pages/Login'; // 👈 NUEVO: importamos Login
+
+import { AuthProvider } from '../context/AuthContext';
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/equipos" element={<Equipos />} />
-          <Route path="/jugadores" element={<Jugadores />} />
-          <Route path="/tabla/:id" element={<Tabla />} />
-          <Route path="/calendario/:id" element={<Calendario />} /> {/* 👈 NUEVA ruta */}
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/equipos" element={<Equipos />} />
+            <Route path="/jugadores" element={<Jugadores />} />
+            <Route path="/tabla/:id" element={<Tabla />} />
+            <Route path="/calendario/:id" element={<Calendario />} />
+            <Route path="/login" element={<Login />} /> {/* 👈 NUEVA ruta */}
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import Tournament, Stage, Group, Team, Player, Venue, Referee, Match, MatchEvent, Standing
+from django.contrib.auth.models import User
+from .models import (
+    Tournament, Stage, Group, Team, Player, Venue,
+    Referee, Match, MatchEvent, Standing
+)
 
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,3 +64,16 @@ class StandingSerializer(serializers.ModelSerializer):
             'id', 'team_name', 'points', 'played', 'wins',
             'draws', 'losses', 'gf', 'ga', 'gd'
         ]
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password']
+
+    def create(self, validated_data):
+        user = User(username=validated_data['username'])
+        user.set_password(validated_data['password'])  # encripta la contraseña
+        user.save()
+        return user
