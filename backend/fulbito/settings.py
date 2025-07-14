@@ -94,3 +94,6 @@ REST_FRAMEWORK = {
 
 # 🌐 CORS (para React)
 CORS_ALLOW_ALL_ORIGINS = True  # En producción, cámbialo por CORS_ALLOWED_ORIGINS = [...]
+# ✅ Confianza en el dominio Railway
+CSRF_TRUSTED_ORIGINS = ['https://campeonato-fulbito-production.up.railway.app']
+
