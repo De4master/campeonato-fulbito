@@ -96,4 +96,9 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True  # En producción, cámbialo por CORS_ALLOWED_ORIGINS = [...]
 # ✅ Confianza en el dominio Railway
 CSRF_TRUSTED_ORIGINS = ['https://campeonato-fulbito-production.up.railway.app']
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# ✅ Cookies seguras (solo en HTTPS)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
