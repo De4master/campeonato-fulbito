@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchTabla = async (id) => {
-  const res = await axios.get(`http://localhost:8000/api/public/standings/${id}/`);
+  const res = await axios.get(`https://campeonato-fulbito-production.up.railway.app/api/public/standings/${id}/`);
   return res.data;
 };
 
@@ -22,7 +22,7 @@ export default function Tabla() {
     setCargando(true);
     setMensaje(null);
     try {
-      await axios.get(`http://localhost:8000/api/calculate-standings/${id}/`);
+      await axios.get(`https://campeonato-fulbito-production.up.railway.app/api/calculate-standings/${id}/`);
       setMensaje('✅ Tabla actualizada correctamente');
       refetch();
     } catch (err) {

@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const fetchEquipos = async () => {
-  const res = await axios.get('http://localhost:8000/api/teams/');
+  const res = await axios.get('https://campeonato-fulbito-production.up.railway.app/api/teams/');
   return res.data;
 };
 
@@ -28,7 +28,7 @@ export default function Equipos() {
 
   const onSubmit = async (formData) => {
     try {
-      await axios.post('http://localhost:8000/api/teams/', formData, {
+      await axios.post('https://campeonato-fulbito-production.up.railway.app/api/teams/', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchPartidosPorEtapa = async (id) => {
-  const res = await axios.get(`http://localhost:8000/api/public/schedule/${id}/`);
+  const res = await axios.get(`https://campeonato-fulbito-production.up.railway.app/api/public/schedule/${id}/`);
   return res.data;
 };
 
